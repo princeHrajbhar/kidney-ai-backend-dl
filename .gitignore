@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Large Files (optional: if you don't want to push weights to GitHub)
+# tumor_weights.weights.h5
+
+# OS Files
+.DS_Store
+Thumbs.db

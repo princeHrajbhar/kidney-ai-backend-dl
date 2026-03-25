@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kidney AI - Tumor Detection</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); text-align: center; width: 400px; }
+        h2 { color: #1a73e8; margin-bottom: 1.5rem; }
+        #upload-area { border: 2px dashed #1a73e8; padding: 2rem; border-radius: 10px; cursor: pointer; transition: 0.3s; }
+        #upload-area:hover { background: #e8f0fe; }
+        button { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 1rem; width: 100%; font-size: 1rem; }
+        #result { margin-top: 1.5rem; padding: 10px; border-radius: 5px; display: none; font-weight: bold; }
+        .tumor { background: #fce8e6; color: #d93025; }
+        .normal { background: #e6f4ea; color: #1e8e3e; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Kidney AI Scanner</h2>
+        <div id="upload-area" onclick="document.getElementById('fileInput').click()">
+            <p>Click or Drag CT Scan Here</p>
+            <input type="file" id="fileInput" hidden onchange="handleFile(this)">
+        </div>
+        <button onclick="analyzeImage()">Analyze Scan</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function analyzeImage() {
+            const fileInput = document.getElementById('fileInput');
+            const resultDiv = document.getElementById('result');
+            if (!fileInput.files[0]) return alert("Please select an image first!");
+
+            resultDiv.style.display = "block";
+            resultDiv.innerText = "Analyzing...";
+            resultDiv.className = "";
+
+            const formData = new FormData();
+            formData.append("file", fileInput.files[0]);
+
+            try {
+                const response = await fetch("http://127.0.0.1:8000/predict", {
+                    method: "POST",
+                    body: formData
+                });
+                const data = await response.json();
+                
+                resultDiv.innerText = `Result: ${data.prediction} (${data.confidence})`;
+                resultDiv.className = data.prediction === "Tumor" ? "tumor" : "normal";
+            } catch (err) {
+                resultDiv.innerText = "Error: Backend not responding";
+            }
+        }
+    </script>
+</body>
+</html>
