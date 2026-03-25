@@ -1,25 +1,24 @@
-# Use a slim Python image to keep the size small
+# Use python slim for a smaller image size
 FROM python:3.10-slim
 
-# Set the working directory inside the container
+# Set work directory
 WORKDIR /app
 
-# Install system dependencies for OpenCV/Pillow if needed
+# Updated system dependencies for modern Debian images
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+    libgl1 \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy only requirements first (for faster builds)
+# Copy requirements and install
 COPY requirements.txt .
-
-# Install Python packages
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application code
+# Copy the rest of the project
 COPY . .
 
-# Expose the port FastAPI runs on
+# Expose FastAPI port
 EXPOSE 8000
 
-# Command to run the API
+# Run the app
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
